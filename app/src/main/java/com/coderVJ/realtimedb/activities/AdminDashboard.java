@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.coderVJ.realtimedb.R;
 import com.coderVJ.realtimedb.adapters.DeliveryRecordAdapter;
 import com.coderVJ.realtimedb.model.User;
+import com.coderVJ.realtimedb.utils.Utils;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -103,38 +104,49 @@ public class AdminDashboard extends AppCompatActivity {
             public void onClick(View view) {
                 String date = edtSelectDate.getText().toString().trim();
                 userList.clear();
-                mFirebaseDatabase.orderByChild("deliveryDate").equalTo(date).addListenerForSingleValueEvent(new ValueEventListener() {
 
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+                if(!Utils.checkEmpty(date)) {
+                    mFirebaseDatabase.orderByChild("deliveryDate").equalTo(date).addListenerForSingleValueEvent(new ValueEventListener() {
 
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
 
-                            Log.e(TAG, "Fetched Data1" + dataSnapshot.toString());
-                            Log.e(TAG, "Fetched Data2" + dataSnapshot.getKey());
-                            Log.e(TAG, "Fetched Data3" + dataSnapshot.getValue().toString());
-                            Log.e(TAG, "Data Count" + dataSnapshot.getChildrenCount());
-                            for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
-                                // Toast.makeText(mContext, "Fetched Data " + dataSnapshot.getValue(), Toast.LENGTH_SHORT).show();
-                                user = postSnapshot.getValue(User.class);
-                                userList.add(user);
-                            }
+                            if (dataSnapshot != null && dataSnapshot.getChildren() != null
+                                    && dataSnapshot.getChildren().iterator().hasNext()) {
 
-                            //Log.e(TAG, "User 1st Delivery date" + userList.get(0).getDeliveryDate());
-                            if (userList.size() > 0 && userList != null) {
-                                recordAdapter = new DeliveryRecordAdapter(mContext, userList);
-                                listRecords.setAdapter(recordAdapter);
-                                txtNoRecords.setVisibility(View.GONE);
-                            } else {
+                                Log.e(TAG, "Fetched Data1" + dataSnapshot.toString());
+                                Log.e(TAG, "Fetched Data2" + dataSnapshot.getKey());
+                                Log.e(TAG, "Fetched Data3" + dataSnapshot.getValue().toString());
+                                Log.e(TAG, "Data Count" + dataSnapshot.getChildrenCount());
+                                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                                    // Toast.makeText(mContext, "Fetched Data " + dataSnapshot.getValue(), Toast.LENGTH_SHORT).show();
+                                    user = postSnapshot.getValue(User.class);
+                                    userList.add(user);
+                                }
+
+                                //Log.e(TAG, "User 1st Delivery date" + userList.get(0).getDeliveryDate());
+                                if (userList.size() > 0 && userList != null) {
+                                    recordAdapter = new DeliveryRecordAdapter(mContext, userList);
+                                    listRecords.setAdapter(recordAdapter);
+                                    txtNoRecords.setVisibility(View.GONE);
+                                } else {
+                                    txtNoRecords.setVisibility(View.VISIBLE);
+                                }
+                            }else {
+                                Toast.makeText(mContext, "No Records Found", Toast.LENGTH_SHORT).show();
                                 txtNoRecords.setVisibility(View.VISIBLE);
                             }
                         }
 
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.e(TAG, "Fetched Daadadat" + databaseError);
-                    }
-                });
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Log.e(TAG, "Fetched Daadadat" + databaseError);
+                        }
+                    });
+                }else {
+                    Toast.makeText(mContext,"Please enter date",Toast.LENGTH_LONG).show();
+                }
 
 
             }
