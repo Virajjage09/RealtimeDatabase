@@ -45,6 +45,8 @@ public class CustomerRegistration extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_customer_registration);
+        
+        getSupportActionBar().setTitle("Registration");
 
         mContext = CustomerRegistration.this;
         inputName = (EditText) findViewById(com.coderVJ.realtimedb.R.id.name);
